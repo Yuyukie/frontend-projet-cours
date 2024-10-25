@@ -77,7 +77,7 @@ export default function Home() {
             item={item} // Passer l'article actuel au composant ShopItem
             totalCookies={cookies}
             key={item.id}
-            onClick={() => { handlePurchasedItem(item) }} // Fonction pour soustraire le prix des cookies lors de l'achat
+            onClick={() => { handlePurchasedItem(item) }}   // Fonction pour soustraire le prix des cookies lors de l'achat
           />
         ))}
       </div>
