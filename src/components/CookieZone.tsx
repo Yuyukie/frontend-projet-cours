@@ -12,7 +12,7 @@ interface Props {
 export const CookieZone = ({ totalCookies, onCookieClick, cps = 0 }: Props) => {
 
     return (
-        <div className="h-full w-full bg-purple-700 flex flex-col gap-10">
+        <div className="h-full w-full flex flex-col items-center justify-center gap-10">
             <p className="">{cps} Cookies par seconde</p>
             <p className="text-3xl font-bold">Total cookies : {totalCookies.toFixed(0)}</p>
             <Image 
