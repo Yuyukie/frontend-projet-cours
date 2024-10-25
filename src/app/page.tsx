@@ -43,7 +43,7 @@ export default function Home() {
 
     setCookies(cookies - item.price)
 
-    let actualItems = [...purchasedItems]
+    const actualItems = [...purchasedItems]
     const itemIndex = actualItems.findIndex(o => o.id == item.id)
     actualItems[itemIndex].total++
 
