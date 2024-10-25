@@ -1,101 +1,86 @@
-import Image from "next/image";
+"use client"; // Indique que ce composant doit être exécuté côté client
+
+import { CookieZone } from "@/components/CookieZone"; // Importation du composant CookieZone pour afficher les cookies
+import { useEffect, useState } from "react"; // Importation des hooks useMemo et useState de React
+import { ShopItem } from "@/components/ShopItem"; // Importation du composant ShopItem pour afficher les articles de la boutique
+import { PurchasedItem } from "@/components/PurchasedItem"; // Changement de 'PurchasedItem' à 'purchasedItem'
+// Définition d'une interface TypeScript pour décrire la structure d'un article de la boutique
+export interface ShopItemType {
+  id: number,
+  image_url: string; // URL de l'image de l'article
+  label: string; // Nom de l'article
+  price: number; // Prix de l'article
+  cps: number; // Cookies par seconde générés par l'article
+  total: number;
+}
+
+const defaultshopItems : ShopItemType[] =[
+  { 
+    id:1,
+    label: "Mamy", // Nom de l'article
+    image_url: "https://img.freepik.com/photos-gratuite/personnage-dessin-anime-3d_23-2151021890.jpg?t=st=1729697464~exp=1729701064~hmac=6f4d2a3e473ec863acb6c43e24f6bc3b9a3658a166b81dcc097425bf17ae3ea1&w=740", // URL de l'image
+    price: 10, // Prix de l'article
+    cps: 1, // Cookies générés par seconde
+    total: 0
+  },
+    {
+    id:2,
+    label: "SuperMamy", // Nom de l'article
+    image_url: "https://img.freepik.com/photos-gratuite/personnage-dessin-anime-3d_23-2151021890.jpg?t=st=1729697464~exp=1729701064~hmac=6f4d2a3e473ec863acb6c43e24f6bc3b9a3658a166b81dcc097425bf17ae3ea1&w=740", // URL de l'image
+    price: 100, // Prix de l'article
+    cps: 10, // Cookies générés par seconde
+    total : 0,
+  },
+];
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  // Déclaration de l'état pour le nombre de cookies, initialisé à 0
+  const [cookies, setCookies] = useState(0);
+  const [purchasedItems, setPurchasedItems] = useState(defaultshopItems)
+  const [cookiesPerSecond, setCookiesPersecond] = useState(0)
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+  const handlePurchasedItem = (item : ShopItemType) => {
+
+    setCookies(cookies - item.price)
+
+    let actualItems = [...purchasedItems]
+    const itemIndex = actualItems.findIndex(o => o.id == item.id)
+    actualItems[itemIndex].total++
+
+    setPurchasedItems([... actualItems])
+    setCookiesPersecond(cookiesPerSecond + item.cps)
+  }
+
+
+  useEffect(() => {
+    const interval = setInterval (() => {
+        setCookies(cookies + cookiesPerSecond / 100)
+      }, 10 )
+      return() => {clearInterval(interval)}
+  })
+ 
+  return (
+    <div className="h-screen w-screen flex"> {/* Conteneur principal avec une hauteur et largeur complètes */}
+      <div className="left w-1/4"> {/* Section gauche avec une largeur de 25% et fond vert */}
+        <CookieZone 
+          totalCookies={cookies} // Passer le nombre total de cookies au composant CookieZone
+          cps={cookiesPerSecond}
+          onCookieClick={() => { setCookies(cookies + 1); }} // Fonction pour incrémenter les cookies au clic
+        />
+      </div>
+      <div className="center flex-1 bg-red-500 grid grid-cols-4 gap-3 p-5">
+        {purchasedItems.filter(item => item.total > 0).map(item => <PurchasedItem key={item.id} item={item} />)}
+      </div>
+      <div className="right w-1/4  flex flex-col gap-3"> {/* Section droite avec une largeur de 25% et fond jaune */}
+        {purchasedItems.map(item => ( // Itération sur chaque article de la boutique
+          <ShopItem 
+            item={item} // Passer l'article actuel au composant ShopItem
+            totalCookies={cookies}
+            key={item.id}
+            onClick={() => { handlePurchasedItem(item) }} // Fonction pour soustraire le prix des cookies lors de l'achat
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+        ))}
+      </div>
     </div>
   );
 }
